@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            background-image: url('/static/images/handyman_background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        h1 {
+            font-size: 35px;
+            font-weight: 800;
+            margin-left: 65px;
+            color: #FFFF19;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .task-list {
+            margin-top: 20px;
+            color: black;
+            background-color: #fffbcc;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            display: none;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .task-item button {
+            background-color: #dc3545;
+        }
+        .task-item button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h1>TO-DO LIST</h1>
+    <input type="text" id="taskInput" placeholder="Enter a task" onkeypress="handleKeyPress(event)">
+    <button onclick="addTask()">Add Task</button>
+    <div class="task-list" id="taskList"></div>
+
+    <script>
+        let tasks = [];
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const task = taskInput.value;
+            if (task) {
+                tasks.push(task);
+                taskInput.value = '';
+                renderTasks();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            if (tasks.length > 0) {
+                taskList.style.display = 'block';
+            } else {
+                taskList.style.display = 'none';
+            }
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `${index + 1}. ${task} <button onclick="removeTask(${index})">Remove</button>`;
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        function removeTask(index) {
+            tasks.splice(index, 1);
+            renderTasks();
+        }
+
+        window.onload = function() {
+            fetch('/tasks')
+            .then(response => response.json())
+            .then(data => {
+                tasks = data.tasks;
+                renderTasks();
+            });
+        }
+    </script>
+</body>
+</html>
